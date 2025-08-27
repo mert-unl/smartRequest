@@ -20,8 +20,9 @@
       ],
       itemPrice: [3242, 3423, 5436, 5234, 2344, 1234, 5678, 9999],
       itemOldPrice: [3421, 4000, 6000, 6000, 3000, 1500, 6000, 12000],
+      itemAdded: [],
       buttonText: "Add To Cart",
-      addedText: "Added To Cart",
+      addedText: "On Cart",
     },
     smallModal: {
       title: "Recently Viewed",
@@ -232,7 +233,7 @@
           font-weight:bold;
           font-size:12px;
           max-width:130px;
-          height:60px;
+          height:50px;
           margin-top:4px;
           line-height:1.1;
           }
@@ -271,6 +272,14 @@
               transition: all 0.3s ease-in;
           }
 
+            ${addToCartButton}.added{
+            background-color: #2abd06ff;
+                          border:1.5px solid #25b801ff;
+
+            color:white;
+            }
+
+               
           ${sliderButton}{
             color:white;
           }
@@ -327,7 +336,10 @@
 
 
             ${smModal}{
-            display:none;
+              display: block;
+              opacity: 0;
+              transform: translateX(100%) translateY(-50%) scale(0.8);
+                transition: all 0.4s ease-in-out;
               border:2px solid #bb0606ff;
               width:80px;
               text-align:center; 
@@ -339,13 +351,13 @@
               background-color:white;   
               border-top-left-radius:12px;
               border-bottom-left-radius:12px;;
-              transition: all 0.3s ease-in-out;
+              transition: all 0.5s ease;
                 }
 
-  ${smModal}.active {
-    transform: translate(0%,-50%) scale(1);
-    opacity: 1;
-  }
+            ${smModal}.active {
+              transform: translate(0%,-50%) scale(1);
+              opacity: 1;
+            }
 
               ${smTitle}{
             color:white;
@@ -372,23 +384,23 @@
             }
           
           ${smSizeUp} {
-    background-color: #bb0606;
-    position: fixed;
-    right: 77px;
-    top: 38px;
-    width: 40px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    border:none;
-    font-size:20px;
-    border-top-left-radius: 60px;
-    border-bottom-left-radius: 60px;
-  }
+            background-color: #bb0606;
+            position: fixed;
+            right: 77px;
+            top: 48px;
+            width: 40px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border:none;
+            font-size:18px;
+            border-top-left-radius: 120px;
+            border-bottom-left-radius: 120px;
+         }
 
 
     ${smPrevButton}{
@@ -478,13 +490,22 @@
       itemName,
       itemPrice,
       itemOldPrice,
-      buttonText,
       sliderButton,
+      itemAdded,
       itemUrl,
+      addedText,
+      buttonText,
     } = config.mainModal;
+
+    const { myStorageKey } = config.storage;
+
+    let products = JSON.parse(localStorage.getItem(myStorageKey)) || [];
+    config.mainModal.itemAdded = products.map((p) => p.isAdded);
 
     const productCards = itemName
       .map((name, i) => {
+        let buttonFinal = itemAdded[i] === "true" ? addedText : buttonText;
+
         return `
           <div class="${productItemCard}"><a href="${itemUrl[i]}" target="_blank">
               <img class="${productImg}" src="${itemImg[i]}" />
@@ -492,7 +513,7 @@
               <p class="${productPrice}" >${itemPrice[i]} TL</p>
               <p class="${productOldPrice}" >${itemOldPrice[i]} TL</p>
               </a>
-              <button class="${addToCartButton}" >${buttonText}</button>
+              <button class="${addToCartButton}" data-index="${i}" >${buttonFinal} </button>
               </div>
     `;
       })
@@ -556,7 +577,7 @@
                       ${productImages}
                   </div>
                   </div>
-                  <button class="${smNextButton}">v</button>
+                  <button class="${smNextButton} ">v</button>
           
           </div>
       `;
@@ -584,12 +605,14 @@
     try {
       let parsed = JSON.parse(raw);
 
-      localStorage.setItem(myStorageKey, JSON.stringify(parsed));
+      let products = parsed?.data?.tr_TR.map((i) => ({
+        ...i,
+        isAdded: false,
+      }));
+      localStorage.setItem(myStorageKey, JSON.stringify(products));
 
       console.log("veri kopyalandı");
       console.log(JSON.parse(localStorage.getItem(myStorageKey)));
-
-      const products = parsed?.data?.tr_TR;
 
       config.mainModal.itemName = products.map((item) =>
         decodeURIComponent(item.name)
@@ -601,8 +624,8 @@
       config.mainModal.itemOldPrice = products.map(
         (item) => item.originalPrice
       );
-
-      $(productImg).attr("src", itemImg[0]);
+      config.mainModal.itemAdded = products.map((item) => item.isAdded);
+      //   $(productImg).attr("src", itemImg[0]);
     } catch (e) {
       console.error("JSON parse hatası:", e);
     }
@@ -689,14 +712,14 @@
     });
 
     $(document).on("click", headDown, () => {
-      $(versusOverlay).hide();
+      $(versusOverlay).fadeOut(400);
       $(smModal).show().addClass("active");
     });
 
     $(document).on("click", smSizeUp, () => {
       $(smModal).removeClass("active");
-      $(smModal).hide();
-      $(versusOverlay).show();
+      setTimeout(() => $(smModal).hide(), 200);
+      $(versusOverlay).fadeIn(400);
     });
 
     //çokomelli
@@ -717,6 +740,24 @@
       `${nextButton},  ${smNextButton}`,
       self.slideNext
     );
+
+    $(document).on("click", selectors.addToCartButton, function () {
+      const index = $(this).data("index");
+
+      // config’te güncelle
+      config.mainModal.itemAdded[index] = true;
+
+      // localStorage güncelle
+      const { myStorageKey } = config.storage;
+      let products = JSON.parse(localStorage.getItem(myStorageKey)) || [];
+      if (products[index]) {
+        products[index].isAdded = true;
+        localStorage.setItem(myStorageKey, JSON.stringify(products));
+      }
+
+      // buton textini güncelle
+      $(this).text(config.mainModal.addedText).addClass("added");
+    });
 
     $(document).on("keydown", (e) => {
       e.preventDefault();
