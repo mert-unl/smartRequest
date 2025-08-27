@@ -21,6 +21,7 @@
       itemPrice: [3242, 3423, 5436, 5234, 2344, 1234, 5678, 9999],
       itemOldPrice: [3421, 4000, 6000, 6000, 3000, 1500, 6000, 12000],
       buttonText: "Add To Cart",
+      addedText: "Added To Cart",
     },
     smallModal: {
       title: "Recently Viewed",
@@ -218,6 +219,10 @@
             padding:6px;
             }
 
+            ${productItemCard} a{
+            text-decoration:none;
+            
+            }
 
           ${productImg}{
           height:160px;    
@@ -403,9 +408,11 @@
 
             ${smPrevButton}:disabled{
               color:gray;
-            }
+               cursor:default;
+              }
 
             ${smNextButton}:disabled{
+              cursor:default;
               color:gray;
               }
           
@@ -473,18 +480,20 @@
       itemOldPrice,
       buttonText,
       sliderButton,
+      itemUrl,
     } = config.mainModal;
 
     const productCards = itemName
       .map((name, i) => {
         return `
-          <div class="${productItemCard}">
+          <div class="${productItemCard}"><a href="${itemUrl[i]}" target="_blank">
               <img class="${productImg}" src="${itemImg[i]}" />
               <h3 class="${productTitle}" >${name}</h3>
               <p class="${productPrice}" >${itemPrice[i]} TL</p>
               <p class="${productOldPrice}" >${itemOldPrice[i]} TL</p>
+              </a>
               <button class="${addToCartButton}" >${buttonText}</button>
-          </div>
+              </div>
     `;
       })
       .join("");
@@ -510,7 +519,10 @@
                     
                       </div>  
                     </div>
-                    <button class="${sliderButton} ${nextButton}">></button>  </div>
+                    <button class="${sliderButton} ${nextButton}">
+                    >
+                    </button>  
+                    </div>
 
                 </div>
             </div>
@@ -523,8 +535,10 @@
     const productImages = itemName
       .map((name, i) => {
         return `
-          <div class="asdaasda">
+          <div>
+            <a href="${itemUrl[i]}" target="_blank">
               <img class="${smImg}" src="${itemImg[i]}" />
+            </a>
           </div>
     `;
       })
@@ -538,6 +552,7 @@
                   <button class="${smPrevButton}">^</button>
                   <div class="${smContent}">
                     <div class="${smSlider}">
+                  
                       ${productImages}
                   </div>
                   </div>
@@ -655,17 +670,6 @@
     }
   };
 
-  self.slideNextButton = (event) => {
-    if (event.which === "r") {
-      const totalItems = config.mainModal.itemName.length;
-      const maxIndex = totalItems - config.slider.itemsPerView;
-      if (config.slider.currentIndex < maxIndex) {
-        config.slider.currentIndex++;
-        self.updateSlider();
-      }
-    }
-  };
-
   self.setEvents = () => {
     const {
       prevButton,
@@ -708,6 +712,12 @@
       self.slideNext
     );
 
+    $(document).on(
+      `click${config.offEvents.slideNext}`,
+      `${nextButton},  ${smNextButton}`,
+      self.slideNext
+    );
+
     $(document).on("keydown", (e) => {
       e.preventDefault();
       if ($(versusOverlay).is(":visible")) {
@@ -720,5 +730,5 @@
     });
   };
 
-  setTimeout(self.init, 5000);
+  self.init();
 })({});
