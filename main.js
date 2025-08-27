@@ -33,6 +33,10 @@
       currentIndex: 0,
       itemsPerView: 3,
     },
+    offEvents: {
+      slidePrev: ".preasdasdvNext",
+      slideNext: ".presadasdvNext",
+    },
   };
 
   const classes = {
@@ -58,14 +62,15 @@
     headClose: "mrt-ins-head-close",
     headDown: "mrt-ins-head-down",
 
-    smModal: "mrt-asdasda",
-    smContent: "mrtgasdasa",
-    smTitle: "merasdasda",
-    smSlider: "asdasad",
-    smPrevButton: "asdf",
-    smNextButton: "sadfgg",
-    smImg: "asdfgghdghd",
-    smImgCard: "sisada",
+    smModal: "mrt-ins-sm-main",
+    smContent: "mrt-ins-sm-content",
+    smTitle: "mrt-ins-sm-title",
+    smSlider: "mrt-ins-sm-slider",
+    smPrevButton: "mrt-ins-prev-button",
+    smNextButton: "mrt-ins-next-button",
+    smImg: "mrt-ins-sm-image",
+    smImgCard: "mrt-ins-sm-img-card",
+    smSizeUp: "mrt-ins-sm-size-up-button",
   };
 
   const selectors = Object.keys(classes).reduce((createdSelector, key) => {
@@ -73,15 +78,18 @@
     return createdSelector;
   }, {});
 
-  /*
   self.reset = () => {
-    const { style } = selectors;
+    const { style, versusOverlay, smModal } = selectors;
     $(style).remove();
-    config.offEvents.forEach((event) => $(document).off(event));
-  }; */
+    $(versusOverlay).remove();
+    $(smModal).remove();
+
+    Object.keys(config.offEvents).forEach((event) => $(document).off(event));
+  };
 
   self.init = () => (
-    !window.jQuery ? self.loadJquery() : self.copyStorage(),
+    !window.jQuery ? self.loadJquery() : self.reset(),
+    self.copyStorage(),
     self.buildHtml(),
     self.buildCss(),
     self.updateSlider(),
@@ -127,272 +135,298 @@
       smPrevButton,
       smNextButton,
       smImg,
-      smImgCard,
       smContent,
+      smSizeUp,
     } = selectors;
 
     const customStyle = `
-        <style class=${style}>
-         
-         ${versusOverlay}{
-            position: fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index:9999;
-         }
+          <style class=${style}>
+          
+          ${versusOverlay}{
+              position: fixed;
+              top:0;
+              left:0;
+              width:100%;
+              height:100%;
+              background: rgba(0, 0, 0, 0.7);
+              z-index:9999;
+          }
 
-          ${versusPreview}{
-           z-index:9000000;
-          position:fixed;
-          top:50%;
-          left:50%;
-          height:400px;
-          width: 500px;
-          color:black;
-          transform: translate(-50%,-50%);
-         }
+            ${versusPreview}{
+            z-index:9000000;
+            position:fixed;
+            top:50%;
+            left:50%;
+            height:400px;
+            width: 500px;
+            color:black;
+            transform: translate(-50%,-50%);
+          }
 
-          ${versusContainer}{
-          display:flex;
-          align-items: stretch;
-          flex-direction:column;
-          height:100%;
-          background-color:white;
-         }
-
-          ${headDiv}{
+            ${versusContainer}{
             display:flex;
-            flex-direction:row;
-            background-color: #aa1a10ff;
-            color:white;
-            justify-content:space-between;
-            align-items:center;
-            padding:10px 20px;
-         }
+            align-items: stretch;
+            flex-direction:column;
+            height:100%;
+            background-color:white;
+          }
 
-
-          ${headTitle}{
-           font-family:Arial;
-         }
-
-          ${contentDiv}{
-           display:flex;
-           flex-direction:row;
-           flex:1;
-           margin:0px;
-           padding:0px;
-           align-items:center;
-           }
-
-
-          ${productMainDiv}{
-          display:flex;
-          flex-direction:row;
-          transition: transform 0.6s ease;
+            ${headDiv}{
+              display:flex;
+              flex-direction:row;
+              background-color: #aa1a10ff;
+              color:white;
+              justify-content:space-between;
+              align-items:center;
+              padding:10px 20px;
           }
 
 
-          ${sliderContainer}{
-           flex: 1;
-           overflow: hidden;
-           position: relative;
-         }
+            ${headTitle}{
+            font-family:Arial;
+          }
 
-   
-    
-           ${productItemCard}{
-           display:flex;
-           flex-direction:column;     
-          max-width:160px;
-          padding:6px;
-         }
-
-
-         ${productImg}{
-         height:160px;    
-           }
-
-          ${productTitle}{
-         font-weight:bold;
-         font-size:12px;
-         max-width:130px;
-        height:60px;
-        margin-top:4px;
-        line-height:1.1;
-         }
-
-
-           ${productPrice}{
-         color:red;
-         font-weight:bold;
-         font-size16px;
-         }
-
-           ${productOldPrice}{
-            color: gray;           
-            text-decoration: line-through; 
-            font-size:13px;
-            margin-bottom:5px;
-            }
-
-           ${addToCartButton}{
-            background-color:white;
-            color:black;
-            font-weight:bold;
-            width:100%;
-            font-size:12px;
-            border:1.5px solid #c92c21ff;
-            padding:2px 10px;
-            margin-top:10px;
-
+            ${contentDiv}{
+            display:flex;
+            flex-direction:row;
+            flex:1;
+            margin:0px;
+            padding:0px;
+            align-items:center;
             }
 
 
-          ${addToCartButton}:hover{
-            background-color: #e43529ff;
+          
+
+            ${sliderContainer}{
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+          }
+
+          ${productMainDiv}{
+            display:flex;
+            flex-direction:row;
+            transition: transform 0.5s ease;
+            }
+
+      
+            ${productItemCard}{
+            display:flex;
+            flex-direction:column;     
+            max-width:160px;
+            padding:6px;
+            }
+
+
+          ${productImg}{
+          height:160px;    
+            }
+
+            ${productTitle}{
+          font-weight:bold;
+          font-size:12px;
+          max-width:130px;
+          height:60px;
+          margin-top:4px;
+          line-height:1.1;
+          }
+
+
+            ${productPrice}{
+          color:red;
+          font-weight:bold;
+          font-size16px;
+          }
+
+            ${productOldPrice}{
+              color: gray;           
+              text-decoration: line-through; 
+              font-size:13px;
+              margin-bottom:5px;
+              }
+
+            ${addToCartButton}{
+              background-color:white;
+              color:black;
+              font-weight:bold;
+              width:100%;
+              font-size:12px;
+              border:1.5px solid #c92c21ff;
+              padding:2px 10px;
+              margin-top:10px;
+
+              }
+
+
+            ${addToCartButton}:hover{
+              background-color: #e43529ff;
+              color:white;
+              cursor:pointer;
+              transition: all 0.3s ease-in;
+          }
+
+          ${sliderButton}{
             color:white;
-             cursor:pointer;
-            font-size:13px;
-            transition: all 0.2s ease-in;
-         }
+          }
 
-        ${sliderButton}{
-          color:white;
-        }
+          ${nextButton}{
+            color: #c92c21ff;
+            font-weight:bold;
+            font-size:42px;
+            background-color:white;
+            border:none;
+            padding:10px;
+            cursor:pointer;
+          }
 
-        ${nextButton}{
-           color: #c92c21ff;
-          font-weight:bold;
-          font-size:42px;
-          background-color:white;
-          border:none;
-          padding:10px;
-          cursor:pointer;
-        }
+          ${prevButton}{
+            color: #c92c21ff;
+            font-weight:bold;
+            font-size:42px;
+            background-color:white;
+            border:none;
+            padding:10px;
+            cursor:pointer;
+          }
 
-        ${prevButton}{
-           color: #c92c21ff;
-          font-weight:bold;
-          font-size:42px;
-          background-color:white;
-          border:none;
-          padding:10px;
-          cursor:pointer;
-        }
-
-        ${prevButton}:disabled{
-        cursor:default;
-        color:gray;
-        }
-
-        ${nextButton}:disabled{
+          ${prevButton}:disabled{
           cursor:default;
           color:gray;
-        }
-        
+          }
 
-        ${headButtons}{
-        background-color: #861d02ff;
-        border:none;
-        text-align:center;
-        font-size:16px;
-         font-family:Arial;
-        padding:0px 8px;
-        color:white;
-        margin-left:4px;
-        cursor:pointer;
-        }
-
-        ${headButtons}:hover{
-          background-color: #6b1904ff;
-        }
-
-
-        ${smModal}{
-        position:fixed;
-        top:50%;
-        right:0;
-        z-index:309453403;
-        height:400px;
-        width:80px;
-        overflow:hidden;
-        display:flex;
-        flex-direction:column;
-        border:2px solid  #cc0707ff;
-        transform: translate(0%,-50%);
-        border-top-left-radius:12px;
-        border-top-right-radius:12px;
-                background-color:black;
-                
-        }
-
-        ${smContent}{
-          display:flex;
-          flex-direction:column;
-          align-items:center;
-          justify-content:center;
-        }
-
-         ${smTitle}{
-          color:white;
-          background-color: #cc0707ff;
-          text-align:center;
-          padding:5px;
-          font-family:Arial;
-          font-size:12px;
-          margin:0px;
-        }
-
-         ${smSlider}{
-           overflor:hidden;
-           z-index:-10;
-         }
-
-       
+          ${nextButton}:disabled{
+            cursor:default;
+            color:gray;
+          }
           
-         ${smPrevButton}{
-           background-color:white;
-           border:none;
-           color:red;
-           font-weight:bold;
-           font-size:32px;
-           height:30px;
-           margin-top:0;
-           padding-top:0;
-           text-align:center;
-           width:30px;
+
+          ${headButtons}{
+          background-color: #861d02ff;
+          border:none;
+          text-align:center;
+          font-size:16px;
+          font-family:Arial;
+          padding:0px 8px;
+          color:white;
+          margin-left:4px;
           cursor:pointer;
-        }
+          }
 
-         ${smNextButton}{
-           background-color:white;
-           border:none;
-           color:red;
-           font-weight:bold;
-           font-size:26px;
-           height:30px;
-           width:30px;
+          ${headButtons}:hover{
+            background-color: #6b1904ff;
+          }
+
+          
+          /*Buradan itibaren sm */
+
+
+            ${smModal}{
+            display:none;
+              border:2px solid #bb0606ff;
+              width:80px;
+              text-align:center; 
+              position:fixed;
+              top:50%;
+              right:0;
+              transform: translate(0%,-50%);
+              z-index:999999;
+              background-color:white;   
+              border-top-left-radius:12px;
+              border-bottom-left-radius:12px;;
+              transition: all 0.3s ease-in-out;
+                }
+
+  ${smModal}.active {
+    transform: translate(0%,-50%) scale(1);
+    opacity: 1;
+  }
+
+              ${smTitle}{
+            color:white;
+            background-color: #bb0606ff;
+            text-align:center;
+            border:none;
+            padding:6px;
+            font-family:Arial;
+            font-size:12px;
+            margin:0px;
+            border-top-left-radius:10px;
+          }
+
+            ${smContent}{
+            overflow:hidden;
+            height:295px;
+            }
+
+    
+            ${smSlider}{
+            display:flex;
+            flex-direction:column;
+            transition: transform 0.5s ease;
+            }
+          
+          ${smSizeUp} {
+    background-color: #bb0606;
+    position: fixed;
+    right: 77px;
+    top: 38px;
+    width: 40px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border:none;
+    font-size:20px;
+    border-top-left-radius: 60px;
+    border-bottom-left-radius: 60px;
+  }
+
+
+    ${smPrevButton}{
+            background-color:b;
+            border:none;
+            color:red;
+            font-weight:bold;
+            font-size:32px;
+            margin-top:0;
+            padding-top:0;
+            text-align:center;
+            width:30px;
+            z-index:2324645645;
+            height:25px;
             cursor:pointer;
-           }
+          }
 
-         ${smImg}{
-             height:85px;
-             background-color:red;
-             margin-top:7px;
-         
-             }
-         
-         ${smImgCard}{
+            ${smPrevButton}:disabled{
+              color:gray;
+            }
 
-        }
-
-
-
-        </style>
-        `;
+            ${smNextButton}:disabled{
+              color:gray;
+              }
+          
+          
+            ${smNextButton}{
+            background-color:white;
+            border:none;
+            color:red;
+            font-weight:bold;
+            font-size:26px;
+            width:30px;
+            height:30px;
+            cursor:pointer;
+            }
+              ${smImg}{
+                padding:5px;
+                border-radius:10px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.19);
+              }
+          </style>
+          `;
     $("head").append(customStyle);
   };
 
@@ -426,6 +460,7 @@
       smImg,
       smImgCard,
       smContent,
+      smSizeUp,
     } = classes;
 
     const {
@@ -443,71 +478,75 @@
     const productCards = itemName
       .map((name, i) => {
         return `
-        <div class="${productItemCard}">
-            <img class="${productImg}" src="${itemImg[i]}" />
-            <h3 class="${productTitle}" >${name}</h3>
-            <p class="${productPrice}" >${itemPrice[i]} TL</p>
-            <p class="${productOldPrice}" >${itemOldPrice[i]} TL</p>
-            <button class="${addToCartButton}" >${buttonText}</button>
-        </div>
-   `;
+          <div class="${productItemCard}">
+              <img class="${productImg}" src="${itemImg[i]}" />
+              <h3 class="${productTitle}" >${name}</h3>
+              <p class="${productPrice}" >${itemPrice[i]} TL</p>
+              <p class="${productOldPrice}" >${itemOldPrice[i]} TL</p>
+              <button class="${addToCartButton}" >${buttonText}</button>
+          </div>
+    `;
       })
       .join("");
 
     const html = `
-     
-         <div class="${versusOverlay}">
-           <div class="${versusPreview}">
-              <div class="${versusContainer}">
-                <div class="${headDiv}">
-                    <h2 class="${headTitle}">${title}</h2>
-                    <div>
-                        <button class="${headDown} ${headButtons}">${sizeDown}</button> 
-                        <button class="${headClose} ${headButtons}">${closeButton}</button> 
-                    </div>
-                </div>
-                <div class="${contentDiv}">
-                  <button class="${sliderButton} ${prevButton}" ><</button>
-                 <div class="${sliderContainer}">
-                  <div class=${productMainDiv}>
-                     
-                  ${productCards}
-                  
-                    </div>  
+      
+          <div class="${versusOverlay}" >
+            <div class="${versusPreview}">
+                <div class="${versusContainer}">
+                  <div class="${headDiv}">
+                      <h2 class="${headTitle}">${title}</h2>
+                      <div>
+                          <button class="${headDown} ${headButtons}">${sizeDown}</button> 
+                          <button class="${headClose} ${headButtons}">${closeButton}</button> 
+                      </div>
                   </div>
-                  <button class="${sliderButton} ${nextButton}">></button>
+                  <div class="${contentDiv}">
+                    <button class="${sliderButton} ${prevButton}" ><</button>
+                  <div class="${sliderContainer}">
+                    <div class=${productMainDiv}>
+                      
+                    ${productCards}
+                    
+                      </div>  
+                    </div>
+                    <button class="${sliderButton} ${nextButton}">></button>  </div>
+
                 </div>
+            </div>
+          </div>
 
-              </div>
-           </div>
-         </div>
+      
+      
+      `;
 
-     
-     
-     `;
     const productImages = itemName
       .map((name, i) => {
         return `
-        <div class="asdaasda">
-            <img class="${smImg}" src="${itemImg[i]}" />
-        </div>
-   `;
+          <div class="asdaasda">
+              <img class="${smImg}" src="${itemImg[i]}" />
+          </div>
+    `;
       })
       .join("");
-    const downSizeHtml = `
-          <div class="${smModal}">
-              <div ckass=${smContent}">
-                <h3  class="${smTitle}">${config.smallModal.title}</h3>
-                <button class="${smPrevButton}">^</button>
-                <div class="${smSlider}">
-                   ${productImages}
-                </div>
-                <button class="${smNextButton}">v</button>
-          </div>
-        </div>
-    `;
 
-    $("body").append(downSizeHtml);
+    const downSizeHtml = `
+            <div class="${smModal}">
+            <button class="${smSizeUp}"><<</button>
+                  <h3  class="${smTitle}">${config.smallModal.title}</h3>
+
+                  <button class="${smPrevButton}">^</button>
+                  <div class="${smContent}">
+                    <div class="${smSlider}">
+                      ${productImages}
+                  </div>
+                  </div>
+                  <button class="${smNextButton}">v</button>
+          
+          </div>
+      `;
+
+    $("body").append(html).append(downSizeHtml);
   };
 
   //Fonksiyon
@@ -616,6 +655,17 @@
     }
   };
 
+  self.slideNextButton = (event) => {
+    if (event.which === "r") {
+      const totalItems = config.mainModal.itemName.length;
+      const maxIndex = totalItems - config.slider.itemsPerView;
+      if (config.slider.currentIndex < maxIndex) {
+        config.slider.currentIndex++;
+        self.updateSlider();
+      }
+    }
+  };
+
   self.setEvents = () => {
     const {
       prevButton,
@@ -624,18 +674,51 @@
       headClose,
       smPrevButton,
       smNextButton,
+      smModal,
+      headDown,
+      smSizeUp,
     } = selectors;
 
     $(document).on("click", headClose, () => {
       $(versusOverlay).remove();
+      $(smModal).remove();
     });
 
-    $(document).on("click", prevButton, self.slidePrev);
-    $(document).on("click", nextButton, self.slideNext);
+    $(document).on("click", headDown, () => {
+      $(versusOverlay).hide();
+      $(smModal).show().addClass("active");
+    });
 
-    $(document).on("click", smPrevButton, self.slidePrev);
-    $(document).on("click", smNextButton, self.slideNext);
+    $(document).on("click", smSizeUp, () => {
+      $(smModal).removeClass("active");
+      $(smModal).hide();
+      $(versusOverlay).show();
+    });
+
+    //çokomelli
+    $(document).on(
+      `click${config.offEvents.slidePrev}`,
+      `${prevButton},  ${smPrevButton}`,
+      self.slidePrev
+    );
+
+    $(document).on(
+      `click${config.offEvents.slideNext}`,
+      `${nextButton},  ${smNextButton}`,
+      self.slideNext
+    );
+
+    $(document).on("keydown", (e) => {
+      e.preventDefault();
+      if ($(versusOverlay).is(":visible")) {
+        if (e.key === "ArrowRight") self.slideNext();
+        if (e.key === "ArrowLeft") self.slidePrev();
+      } else if ($(smModal).is(":visible")) {
+        if (e.key === "ArrowDown") self.slideNext();
+        if (e.key === "ArrowUp") self.slidePrev();
+      }
+    });
   };
 
-  self.init();
+  setTimeout(self.init, 5000);
 })({});
