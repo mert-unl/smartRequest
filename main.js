@@ -8,10 +8,22 @@
       closeButton: "x",
       itemUrl: [],
       itemImg: [],
-      itemName: ["asda", "asda", "sadasda", "sadasd", "asdasd"],
-      itemPrice: [3242, 3423, 5436, 5234, 2344],
-      itemOldPrice: [3421],
+      itemName: [
+        "asda",
+        "asda",
+        "sadasda",
+        "sadasd",
+        "asdasd",
+        "product6",
+        "product7",
+        "product8",
+      ],
+      itemPrice: [3242, 3423, 5436, 5234, 2344, 1234, 5678, 9999],
+      itemOldPrice: [3421, 4000, 6000, 6000, 3000, 1500, 6000, 12000],
       buttonText: "Add To Cart",
+    },
+    smallModal: {
+      title: "Recently Viewed",
     },
     storage: {
       myStorageKey: "mertItemStorage",
@@ -41,7 +53,19 @@
     nextButton: "mrt-ins-nextButton",
     prevButton: "mrt-ins-prevButton",
     sliderContainer: "mrt-ins-sliderContainer",
-    sliderButton: "mrt-ins-sliderBtn",
+    sliderButton: "mrt-ins-sliderButton",
+    headButtons: "mrt-ins-headButtons",
+    headClose: "mrt-ins-head-close",
+    headDown: "mrt-ins-head-down",
+
+    smModal: "mrt-asdasda",
+    smContent: "mrtgasdasa",
+    smTitle: "merasdasda",
+    smSlider: "asdasad",
+    smPrevButton: "asdf",
+    smNextButton: "sadfgg",
+    smImg: "asdfgghdghd",
+    smImgCard: "sisada",
   };
 
   const selectors = Object.keys(classes).reduce((createdSelector, key) => {
@@ -59,7 +83,9 @@
   self.init = () => (
     !window.jQuery ? self.loadJquery() : self.copyStorage(),
     self.buildHtml(),
-    self.buildCss()
+    self.buildCss(),
+    self.updateSlider(),
+    self.setEvents()
   );
 
   self.loadJquery = () => {
@@ -90,6 +116,19 @@
       productImg,
       sliderButton,
       sliderContainer,
+      prevButton,
+      nextButton,
+      headButtons,
+      headClose,
+      headDown,
+      smModal,
+      smTitle,
+      smSlider,
+      smPrevButton,
+      smNextButton,
+      smImg,
+      smImgCard,
+      smContent,
     } = selectors;
 
     const customStyle = `
@@ -101,7 +140,7 @@
             left:0;
             width:100%;
             height:100%;
-            background: rgba(0, 0, 0, 0.70);
+            background: rgba(0, 0, 0, 0.7);
             z-index:9999;
          }
 
@@ -127,7 +166,7 @@
           ${headDiv}{
             display:flex;
             flex-direction:row;
-            background-color:#8f0a00;
+            background-color: #aa1a10ff;
             color:white;
             justify-content:space-between;
             align-items:center;
@@ -142,75 +181,216 @@
           ${contentDiv}{
            display:flex;
            flex-direction:row;
-        
-         }
+           flex:1;
+           margin:0px;
+           padding:0px;
+           align-items:center;
+           }
+
 
           ${productMainDiv}{
           display:flex;
           flex-direction:row;
-          gap:1.2rem;      
-                    width: calc(100% * ${Math.ceil(
-                      config.mainModal.itemName.length /
-                        config.slider.itemsPerView
-                    )});
-   
+          transition: transform 0.6s ease;
           }
-              ${sliderContainer}{
+
+
+          ${sliderContainer}{
            flex: 1;
            overflow: hidden;
            position: relative;
          }
-         ${productItemCard}{
-          min-width: calc((100% / ${config.slider.itemsPerView}) - 14px);
-           max-width: calc((100% / ${config.slider.itemsPerView}) - 14px);
-         max-width:150px;
+
+   
+    
+           ${productItemCard}{
+           display:flex;
+           flex-direction:column;     
+          max-width:160px;
+          padding:6px;
          }
 
 
          ${productImg}{
-         height:150px;
-         width:150px;
-         max-width:100px;
-         }
+         height:160px;    
+           }
 
           ${productTitle}{
          font-weight:bold;
-         font-size:14px;
-
+         font-size:12px;
+         max-width:130px;
+        height:60px;
+        margin-top:4px;
+        line-height:1.1;
          }
 
-           ${productItem}{
-         
-         }
 
            ${productPrice}{
-         
+         color:red;
+         font-weight:bold;
+         font-size16px;
          }
 
            ${productOldPrice}{
-         
-         }
+            color: gray;           
+            text-decoration: line-through; 
+            font-size:13px;
+            margin-bottom:5px;
+            }
 
            ${addToCartButton}{
             background-color:white;
             color:black;
             font-weight:bold;
-            border:2px solid #c92c21ff;
-            padding:4px 10px;
-         }
+            width:100%;
+            font-size:12px;
+            border:1.5px solid #c92c21ff;
+            padding:2px 10px;
+            margin-top:10px;
 
-    
-           ${addToCartButton}:hover{
+            }
+
+
+          ${addToCartButton}:hover{
             background-color: #e43529ff;
             color:white;
              cursor:pointer;
+            font-size:13px;
+            transition: all 0.2s ease-in;
          }
 
+        ${sliderButton}{
+          color:white;
+        }
 
+        ${nextButton}{
+           color: #c92c21ff;
+          font-weight:bold;
+          font-size:42px;
+          background-color:white;
+          border:none;
+          padding:10px;
+          cursor:pointer;
+        }
 
+        ${prevButton}{
+           color: #c92c21ff;
+          font-weight:bold;
+          font-size:42px;
+          background-color:white;
+          border:none;
+          padding:10px;
+          cursor:pointer;
+        }
 
+        ${prevButton}:disabled{
+        cursor:default;
+        color:gray;
+        }
 
+        ${nextButton}:disabled{
+          cursor:default;
+          color:gray;
+        }
         
+
+        ${headButtons}{
+        background-color: #861d02ff;
+        border:none;
+        text-align:center;
+        font-size:16px;
+         font-family:Arial;
+        padding:0px 8px;
+        color:white;
+        margin-left:4px;
+        cursor:pointer;
+        }
+
+        ${headButtons}:hover{
+          background-color: #6b1904ff;
+        }
+
+
+        ${smModal}{
+        position:fixed;
+        top:50%;
+        right:0;
+        z-index:309453403;
+        height:400px;
+        width:80px;
+        overflow:hidden;
+        display:flex;
+        flex-direction:column;
+        border:2px solid  #cc0707ff;
+        transform: translate(0%,-50%);
+        border-top-left-radius:12px;
+        border-top-right-radius:12px;
+                background-color:black;
+                
+        }
+
+        ${smContent}{
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+        }
+
+         ${smTitle}{
+          color:white;
+          background-color: #cc0707ff;
+          text-align:center;
+          padding:5px;
+          font-family:Arial;
+          font-size:12px;
+          margin:0px;
+        }
+
+         ${smSlider}{
+           overflor:hidden;
+           z-index:-10;
+         }
+
+       
+          
+         ${smPrevButton}{
+           background-color:white;
+           border:none;
+           color:red;
+           font-weight:bold;
+           font-size:32px;
+           height:30px;
+           margin-top:0;
+           padding-top:0;
+           text-align:center;
+           width:30px;
+          cursor:pointer;
+        }
+
+         ${smNextButton}{
+           background-color:white;
+           border:none;
+           color:red;
+           font-weight:bold;
+           font-size:26px;
+           height:30px;
+           width:30px;
+            cursor:pointer;
+           }
+
+         ${smImg}{
+             height:85px;
+             background-color:red;
+             margin-top:7px;
+         
+             }
+         
+         ${smImgCard}{
+
+        }
+
+
+
         </style>
         `;
     $("head").append(customStyle);
@@ -235,6 +415,17 @@
       prevButton,
       nextButton,
       sliderContainer,
+      headButtons,
+      headDown,
+      headClose,
+      smModal,
+      smTitle,
+      smSlider,
+      smPrevButton,
+      smNextButton,
+      smImg,
+      smImgCard,
+      smContent,
     } = classes;
 
     const {
@@ -252,15 +443,13 @@
     const productCards = itemName
       .map((name, i) => {
         return `
-   
-       <div class="${productItemCard}">
-                       <img  class="${productImg}" src="${itemImg[i]}" />
-                       <h3 class="${productTitle}" >${name}</h3>
-                       <p class="${productPrice}" >${itemPrice[i]}</p>
-                       <p class="${productOldPrice}" >${itemOldPrice[i]}</p>
-                       <button class="${addToCartButton}" >${buttonText}</button>
-                    </div>
-   
+        <div class="${productItemCard}">
+            <img class="${productImg}" src="${itemImg[i]}" />
+            <h3 class="${productTitle}" >${name}</h3>
+            <p class="${productPrice}" >${itemPrice[i]} TL</p>
+            <p class="${productOldPrice}" >${itemOldPrice[i]} TL</p>
+            <button class="${addToCartButton}" >${buttonText}</button>
+        </div>
    `;
       })
       .join("");
@@ -273,8 +462,8 @@
                 <div class="${headDiv}">
                     <h2 class="${headTitle}">${title}</h2>
                     <div>
-                        <button>${sizeDown}</button> 
-                        <button>${closeButton}</button> 
+                        <button class="${headDown} ${headButtons}">${sizeDown}</button> 
+                        <button class="${headClose} ${headButtons}">${closeButton}</button> 
                     </div>
                 </div>
                 <div class="${contentDiv}">
@@ -296,14 +485,37 @@
      
      
      `;
+    const productImages = itemName
+      .map((name, i) => {
+        return `
+        <div class="asdaasda">
+            <img class="${smImg}" src="${itemImg[i]}" />
+        </div>
+   `;
+      })
+      .join("");
+    const downSizeHtml = `
+          <div class="${smModal}">
+              <div ckass=${smContent}">
+                <h3  class="${smTitle}">${config.smallModal.title}</h3>
+                <button class="${smPrevButton}">^</button>
+                <div class="${smSlider}">
+                   ${productImages}
+                </div>
+                <button class="${smNextButton}">v</button>
+          </div>
+        </div>
+    `;
 
-    $("body").append(html);
+    $("body").append(downSizeHtml);
   };
 
   //Fonksiyon
 
   self.copyStorage = () => {
     const { myStorageKey, sourceKey } = config.storage;
+    const { itemName, itemUrl, itemImg, itemOldPrice, itemPrice } =
+      config.mainModal;
     const { productImg } = selectors;
     // Veriyi oku
     if (localStorage.getItem(sourceKey) === undefined || null) {
@@ -316,10 +528,8 @@
       return;
     }
     try {
-      // JSON olarak parse et
       let parsed = JSON.parse(raw);
 
-      // Yeni key'e tekrar yaz
       localStorage.setItem(myStorageKey, JSON.stringify(parsed));
 
       console.log("veri kopyalandı");
@@ -338,7 +548,7 @@
         (item) => item.originalPrice
       );
 
-      $(productImg).attr("src", config.mainModal.itemImg[0]);
+      $(productImg).attr("src", itemImg[0]);
     } catch (e) {
       console.error("JSON parse hatası:", e);
     }
@@ -346,104 +556,85 @@
 
   //fonksiyonlar
 
-  let currentIndex = 0;
+  self.updateSlider = () => {
+    const {
+      productMainDiv,
+      prevButton,
+      nextButton,
+      smSlider,
+      smPrevButton,
+      smNextButton,
+    } = selectors;
 
-  self.initSlider = () => {
-    const { productMainDivi } = selectors;
-    const $slider = $(productMainDiv);
-
-    const slide = (direction) => {
-      const total = $slider.children().length;
-      const cardWidth = $slider.children().outerWidth(true);
-
-      if (direction === "next") {
-        if (currentIndex < total - 1) {
-          currentIndex++;
-        }
-      } else {
-        if (currentIndex > 0) {
-          currentIndex--;
-        }
-      }
-
-      $slider.css({
-        transform: `translateX(-${currentIndex * cardWidth}px)`,
-        transition: "transform 0.5s ease",
-      });
-    };
-
-    $(".mrt-ins-prevBtn").on("click", () => slide("prev"));
-    $(".mrt-ins-nextBtn").on("click", () => slide("next"));
-  };
-  self.initSlider = () => {
-    const { productMainDiv, prevBtn, nextBtn } = selectors;
-    const { itemsPerView } = config.slider;
     const totalItems = config.mainModal.itemName.length;
-    const maxIndex = Math.max(0, totalItems - itemsPerView);
 
-    self.updateSlider = () => {
-      const $slider = $(productMainDiv);
-      const slideWidth = 100 / itemsPerView;
-      const translateX = -(config.slider.currentIndex * slideWidth);
+    const $slider = $(productMainDiv);
+    const $smSlider = $(smSlider);
 
-      $slider.css({
-        transform: `translateX(${translateX}%)`,
-      });
+    const itemsPerView = config.slider.itemsPerView;
+    const shift = 100 / itemsPerView;
 
-      // Button durumlarını güncelle
-      $(prevBtn).prop("disabled", config.slider.currentIndex === 0);
-      $(nextBtn).prop("disabled", config.slider.currentIndex >= maxIndex);
-    };
+    $slider.children().css("flex", `0 0 ${shift}%`);
+    $smSlider.children().css("flex", `0 0 ${shift}%`);
 
-    self.slideNext = () => {
-      if (config.slider.currentIndex < maxIndex) {
-        config.slider.currentIndex++;
-        self.updateSlider();
-      }
-    };
-
-    self.slidePrev = () => {
-      if (config.slider.currentIndex > 0) {
-        config.slider.currentIndex--;
-        self.updateSlider();
-      }
-    };
-
-    // İlk durumu ayarla
-    self.updateSlider();
-  };
-
-  self.bindEvents = () => {
-    const { prevBtn, nextBtn, closeBtn, versusOverlay } = selectors;
-
-    // Slider butonları
-    $(document).on("click", prevBtn, self.slidePrev);
-    $(document).on("click", nextBtn, self.slideNext);
-
-    // Kapatma butonları
-    $(document).on("click", closeBtn, self.closeModal);
-    $(document).on("click", versusOverlay, (e) => {
-      if (e.target === e.currentTarget) {
-        self.closeModal();
-      }
+    const translateX = -(config.slider.currentIndex * shift);
+    $slider.css({
+      transform: `translateX(${translateX}%)`,
     });
 
-    // Klavye desteği
-    $(document).on("keydown", (e) => {
-      if (e.key === "Escape") {
-        self.closeModal();
-      } else if (e.key === "ArrowLeft") {
-        self.slidePrev();
-      } else if (e.key === "ArrowRight") {
-        self.slideNext();
-      }
+    const translateY = -(config.slider.currentIndex * shift);
+    $smSlider.css({
+      transform: `translateY(${translateY}%)`,
     });
+
+    $(prevButton).prop("disabled", config.slider.currentIndex === 0);
+    $(nextButton).prop(
+      "disabled",
+      config.slider.currentIndex >= totalItems - itemsPerView
+    );
+
+    $(smPrevButton).prop("disabled", config.slider.currentIndex === 0);
+    $(smNextButton).prop(
+      "disabled",
+      config.slider.currentIndex >= totalItems - itemsPerView
+    );
   };
 
-  self.closeModal = () => {
-    const { versusOverlay, style } = selectors;
-    $(versusOverlay).remove();
-    $(style).remove();
+  self.slideNext = () => {
+    const totalItems = config.mainModal.itemName.length;
+    const maxIndex = totalItems - config.slider.itemsPerView;
+    if (config.slider.currentIndex < maxIndex) {
+      config.slider.currentIndex++;
+      self.updateSlider();
+    }
+  };
+
+  self.slidePrev = () => {
+    if (config.slider.currentIndex > 0) {
+      config.slider.currentIndex--;
+      self.updateSlider();
+    }
+  };
+
+  self.setEvents = () => {
+    const {
+      prevButton,
+      nextButton,
+      versusOverlay,
+      headClose,
+      smPrevButton,
+      smNextButton,
+    } = selectors;
+
+    $(document).on("click", headClose, () => {
+      $(versusOverlay).remove();
+    });
+
+    $(document).on("click", prevButton, self.slidePrev);
+    $(document).on("click", nextButton, self.slideNext);
+
+    $(document).on("click", smPrevButton, self.slidePrev);
+    $(document).on("click", smNextButton, self.slideNext);
   };
 
   self.init();
